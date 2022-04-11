@@ -283,7 +283,7 @@ class Recommender:
             return qualified
 
         print(improved_recommendations('The Dark Knight'))
-        # self.smd = smd
+        self.smd = smd
         self.indices = indices
 
     def collaborative_filtering(self):
@@ -337,11 +337,14 @@ class Recommender:
 
         print('\nHybrid Content Based + Collaborative Filtering')
 
-        user = 500
-        movie = 'Inception'
+        user = 1
+        movie = 'The Dark Knight'
 
         print('Results for \nuser: %d\n movie: %s\n' % (user, movie))
-        print(hybrid(user, movie))
+        res = hybrid(user, movie)
+        print(res)
+        with open('user1.csv', 'w') as f:
+            res.to_csv(f)
 
 if __name__ == "__main__":
 
