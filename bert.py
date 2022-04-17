@@ -13,7 +13,7 @@ import pandas as pd
 from yaml import KeyToken
 import numpy as np
 from sentence_transformers import SentenceTransformer
-import sklearn.metrics 
+from sklearn.metrics.pairwise import cosine_similarity
 
 class BertRecommender:
 
@@ -193,7 +193,7 @@ class BertRecommender:
 
         # compute simularity kernel
         print('calculating cosine simularity')
-        self.simularity = sklearn.metrics.pairwise.cosine_simularity(embeddings)
+        self.simularity = cosine_similarity(embeddings)
 
     def prompt_model(self, prompt):
         df = self.df
