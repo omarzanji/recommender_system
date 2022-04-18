@@ -20,8 +20,10 @@ class BertRecommender:
 
     def __init__(self):
         try:
+            print('\nloading existing pre-processed data...\n')
             self.df = pd.read_csv('cleaned_data.csv')
         except:
+            print('\npre-processing data...\n')
             self.process_data()
 
     def process_data(self):
@@ -205,7 +207,7 @@ class BertRecommender:
             # save embeddings
             print('\nsaving BERT embeddings on corpus\n')
             with open('movie_rec_bert_embeddings.pkl', 'wb') as f:
-                pickle.dump({'embeddings': self.embeddings})
+                pickle.dump({'embeddings': self.embeddings}, f)
 
         # compute similarity kernel
         print('\ncalculating cosine similarity\n')
