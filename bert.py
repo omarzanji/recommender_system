@@ -176,7 +176,7 @@ class BertRecommender:
         df['combined_value'] = df.apply(combine_features, axis=1)
         df['index'] = [i for i in range(0, len(df))]
 
-        print('saving data...')
+        print('\nsaving data...')
         df.to_csv('cleaned_data.csv')
         self.df = df
 
@@ -215,18 +215,20 @@ class BertRecommender:
         # get title of movie 
         def title(index):
             return df[df.index == index]['original_title'].values[0]
+
+        # get index of movie title to grab its similarity matrix
         def index(original_title):
             print('index out: ')
             print(df[df.original_title == original_title]['index'])
             return df[df.original_title == original_title]['index'].values[0]
 
-        movie_rec = sorted(list(enumerate(self.similarity[index(prompt)])), key=lambda x:x[1], reverse=True)
+        self.movie_rec = sorted(list(enumerate(self.similarity[index(prompt)])), key=lambda x:x[1], reverse=True)
         print('Top 5 movie recommendations for %s:' % prompt)
-        print(title(movie_rec[1][0]))
-        print(title(movie_rec[2][0]))
-        print(title(movie_rec[3][0]))
-        print(title(movie_rec[4][0]))
-        print(title(movie_rec[5][0]))
+        print(title(self.movie_rec[1][0]))
+        print(title(self.movie_rec[2][0]))
+        print(title(self.movie_rec[3][0]))
+        print(title(self.movie_rec[4][0]))
+        print(title(self.movie_rec[5][0]))
 
 
 
