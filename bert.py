@@ -8,6 +8,7 @@ sources:
 from cmath import nan
 import json
 import ast
+import pickle
 from zlib import DEF_MEM_LEVEL
 import pandas as pd
 from yaml import KeyToken
@@ -184,16 +185,31 @@ class BertRecommender:
         def index(original_title):
             return df[df.original_title == original_title]['index'].values[0]
 
-        print('init bert')
+        print('\ninit bert\n')
         bert = SentenceTransformer('nq-distilbert-base-v1')
 
-        # create embeddings
-        print('creating embeddings')
-        embeddings = bert.encode(df['combined_value'].tolist())
+        try: # try loading pre-compouted embeddings
+            with open('movie_rec_bert_embeddings.pkl', 'rb') as f:
+                print('\nFound existing embeddings, loading...\n')
+                data = pickle.load(f)
+                self.embeddings = data['embeddings']
+        except: # create new embeddings and save
+            # create embeddings
+            print('\ncreating embeddings\n')
+            self.embeddings = bert.encode(
+                df['combined_value'].tolist(),
+                show_progress_bar=True,
+                convert_to_numpy=True
+            )
 
-        # compute simularity kernel
-        print('calculating cosine simularity')
-        self.simularity = cosine_similarity(embeddings)
+            # save embeddings
+            print('\nsaving BERT embeddings on corpus\n')
+            with open('movie_rec_bert_embeddings.pkl', 'wb') as f:
+                pickle.dump({'embeddings': self.embeddings})
+
+        # compute similarity kernel
+        print('\ncalculating cosine similarity\n')
+        self.similarity = cosine_similarity(self.embeddings)
         self.df = df
 
     def prompt_model(self, prompt):
@@ -205,10 +221,13 @@ class BertRecommender:
         def index(original_title):
             return df[df.original_title == original_title]['index'].values[0]
 
-        movie_rec = sorted(list(enumerate(self.simularity[index(prompt)])), key=lambda x:x[1], reverse=True)
+        movie_rec = sorted(list(enumerate(self.similarity[index(prompt)])), key=lambda x:x[1], reverse=True)
+        print('Top 5 movie recommendations for %s:' % prompt)
         print(title(movie_rec[1][0]))
         print(title(movie_rec[2][0]))
         print(title(movie_rec[3][0]))
+        print(title(movie_rec[4][0]))
+        print(title(movie_rec[5][0]))
 
 
 
