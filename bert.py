@@ -194,6 +194,7 @@ class BertRecommender:
         # compute simularity kernel
         print('calculating cosine simularity')
         self.simularity = cosine_similarity(embeddings)
+        self.df = df
 
     def prompt_model(self, prompt):
         df = self.df
@@ -203,6 +204,7 @@ class BertRecommender:
 
         def index(original_title):
             return df[df.original_title == original_title]['index'].values[0]
+
         movie_rec = sorted(list(enumerate(self.simularity[index(prompt)])), key=lambda x:x[1], reverse=True)
         print(title(movie_rec[1][0]))
         print(title(movie_rec[2][0]))
