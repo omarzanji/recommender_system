@@ -20,8 +20,8 @@ class BertRecommender:
 
     def __init__(self):
         try:
-            print('\nloading existing pre-processed data...\n')
             self.df = pd.read_csv('cleaned_data.csv')
+            print('\nloading existing pre-processed data...\n')
         except:
             print('\npre-processing data...\n')
             self.process_data()
@@ -163,12 +163,8 @@ class BertRecommender:
         df_merge_whole['cast'].replace('', np.nan, inplace=True)
         df_merge_whole['crew'].replace('', np.nan, inplace=True)
         df_merge_whole['release_date'].replace('', np.nan, inplace=True)
-        self.df = df_merge_whole.dropna()
-        self.df.to_csv('cleaned_data.csv')
-
-
-    def create_model(self):
-        df = self.df.dropna()
+        df = df_merge_whole.dropna()
+        
 
         # helper function for combining columns
         def combine_features(row):
@@ -180,13 +176,12 @@ class BertRecommender:
         df['combined_value'] = df.apply(combine_features, axis=1)
         df['index'] = [i for i in range(0, len(df))]
 
-        # get title of movie 
-        def title(index):
-            return df[df.index == index]['original_title'].values[0]
+        print('saving data...')
+        df.to_csv('cleaned_data.csv')
+        self.df = df
 
-        def index(original_title):
-            return df[df.original_title == original_title]['index'].values[0]
-
+    def create_model(self):
+        df = self.df
         print('\ninit bert\n')
         bert = SentenceTransformer('nq-distilbert-base-v1')
 
@@ -216,11 +211,13 @@ class BertRecommender:
 
     def prompt_model(self, prompt):
         df = self.df
+        
         # get title of movie 
         def title(index):
             return df[df.index == index]['original_title'].values[0]
-
         def index(original_title):
+            print('index out: ')
+            print(df[df.original_title == original_title]['index'])
             return df[df.original_title == original_title]['index'].values[0]
 
         movie_rec = sorted(list(enumerate(self.similarity[index(prompt)])), key=lambda x:x[1], reverse=True)
